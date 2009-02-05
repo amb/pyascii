@@ -5,11 +5,16 @@ import numpy
 import os
 from processing import Process, Queue
 
+def grayscale(arr):
+    """ Makes a color image a grayscale one
+        image is given in 2d numpy array format """
+    return arr/65536
+
 def compare_blocks(ba1, ba2):
     """ Compare two grayscale 2D pixel buffers and calculate their square sum difference """    
     # this is why I love numpy :)
-    ba1 = ba1 / (65536)    
-    ba2 = ba2 / (65536)
+    #ba1 = ba1 / (65536)    
+    #ba2 = ba2 / (65536)
     bares = (ba1 - ba2)**2
     price = numpy.add.reduce(bares.flat)/ba1.shape[0]
             
@@ -77,6 +82,7 @@ class AsciiRenderer:
                 
                 # convert to numpy type array
                 self.char_pix[char] = pygame.surfarray.array2d(surf.subsurface(rec))
+                self.char_pix[char] = grayscale(self.char_pix[char])
                 self.char_rec[char] = rec
                 
                 #print char+": "+repr(char_pix[char].shape[0])+"="+repr(rec.width)
@@ -98,6 +104,7 @@ class AsciiRenderer:
         # convert picture to numpy arrays
         self.num_threads = 4
         pic_arr = pygame.surfarray.array2d(pic)
+        pic_arr = grayscale(pic_arr)
         
         # split data for threading
         rows = pic_arr.shape[1] / self.text_height  
