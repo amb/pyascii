@@ -13,8 +13,6 @@ def grayscale(arr):
 def compare_blocks(ba1, ba2):
     """ Compare two grayscale 2D pixel buffers and calculate their square sum difference """    
     # this is why I love numpy :)
-    #ba1 = ba1 / (65536)    
-    #ba2 = ba2 / (65536)
     bares = (ba1 - ba2)**2
     price = numpy.add.reduce(bares.flat)/ba1.shape[0]
             
@@ -57,7 +55,7 @@ class AsciiRenderer:
         self.char_rec = {}
         for i in range(33,0x4FF):
             try:
-                unichr(i).decode(self.used_encoding)
+                unichr(i)#.decode(self.used_encoding)
             except UnicodeDecodeError:
                 continue
             except UnicodeEncodeError:
@@ -98,7 +96,7 @@ class AsciiRenderer:
         print "Max character width: "+repr(self.max_width)
         print "Character height: "+repr(self.max_height)
         
-        chr_set = ''.join(self.char_pix.keys()) #.decode('utf-8','replace')
+        chr_set = ''.join(self.char_pix.keys()) 
         print "Character set: ",chr_set       
  
         # convert picture to numpy arrays
