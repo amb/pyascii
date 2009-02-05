@@ -35,6 +35,8 @@ class AsciiRenderer:
         # load and init font
         fontfile = pygame.font.match_font('lucida console')
         font = pygame.font.Font(fontfile, 14)
+        
+        self.fixed_width = 8
 
         # list of characters that are used in the creation of the ASCII art
         self.charlist = []
@@ -48,9 +50,9 @@ class AsciiRenderer:
         self.max_height = 0
         self.char_pix = {}
         self.char_rec = {}
-        for i in range(33,0x1FF):
+        for i in range(33,0x4FF):
             try:
-                unichr(i).encode(self.used_encoding)
+                unichr(i).decode(self.used_encoding)
             except UnicodeDecodeError:
                 continue
             except UnicodeEncodeError:
@@ -89,7 +91,9 @@ class AsciiRenderer:
                     
         print "Max character width: "+repr(self.max_width)
         print "Character height: "+repr(self.max_height)
-        print "Character set: "+''.join(self.char_pix.keys())       
+        
+        chr_set = ''.join(self.char_pix.keys()) #.decode('utf-8','replace')
+        print "Character set: ",chr_set       
  
         # convert picture to numpy arrays
         self.num_threads = 4
@@ -120,7 +124,7 @@ class AsciiRenderer:
         # Init each process
         for i in range(self.num_threads):
             qs.append(Queue())
-            th.append(Renderer(self.char_pix, self.text_height, self.max_width, self.thr_arr[i], qs[i]))
+            th.append(Renderer(self.char_pix, self.text_height, self.max_width, self.thr_arr[i], self.fixed_width, qs[i]))
             th[i].start()
         
         # Wait for processes to finish
@@ -135,12 +139,13 @@ class AsciiRenderer:
 
         
 class Renderer(Process):
-    def __init__(self, char_pix, text_height, max_width, pic_arr, q):
+    def __init__(self, char_pix, text_height, max_width, pic_arr, fixed_width, q):
         Process.__init__(self)
         self.char_pix = char_pix
         self.text_height = text_height
         self.max_width = max_width
         self.pic_arr = pic_arr
+        self.fixed_width = fixed_width
         self.q = q
         self.outstring = ""
         
@@ -175,7 +180,11 @@ class Renderer(Process):
                     # block finished, quit
                     run_loop = False
     
-            x += self.char_pix[best_char].shape[0]
+            if self.fixed_width <= 0:
+                x += self.char_pix[best_char].shape[0]
+            else:
+                x += self.fixed_width
+                
             self.outstring += best_char
         
         # Send data to message queue
