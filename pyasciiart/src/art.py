@@ -8,7 +8,7 @@ from processing import Process, Queue
 def compare_blocks(ba1, ba2):
     """ Compare two grayscale 2D pixel buffers and calculate their square sum difference """    
     # this is why I love numpy :)
-    
+    ba1 = ba1 / (65536)    
     ba2 = ba2 / (65536)
     bares = (ba1 - ba2)**2
     price = numpy.add.reduce(bares.flat)/ba1.shape[0]
