@@ -38,7 +38,7 @@ class AsciiRenderer:
 
         # list of characters that are used in the creation of the ASCII art
         self.charlist = []
-        self.used_encoding = 'latin-1'
+        self.used_encoding = 'utf-8'
         
         # generate character set
         self.fgcolor = (255,255,255)
@@ -48,9 +48,9 @@ class AsciiRenderer:
         self.max_height = 0
         self.char_pix = {}
         self.char_rec = {}
-        for i in range(33,0xFF):
+        for i in range(33,0x1FF):
             try:
-                chr(i).encode(self.used_encoding)
+                unichr(i).encode(self.used_encoding)
             except UnicodeDecodeError:
                 continue
             except UnicodeEncodeError:
@@ -62,7 +62,7 @@ class AsciiRenderer:
                 surf.fill(self.bgcolor, surf.get_rect())
                 
                 # get character code
-                char = chr(i)
+                char = unichr(i)
                 self.charlist.append(char)
                 
                 # render character
@@ -89,7 +89,8 @@ class AsciiRenderer:
                     
         print "Max character width: "+repr(self.max_width)
         print "Character height: "+repr(self.max_height)
-        
+        print "Character set: "+''.join(self.char_pix.keys())       
+ 
         # convert picture to numpy arrays
         self.num_threads = 4
         pic_arr = pygame.surfarray.array2d(pic)
