@@ -53,9 +53,9 @@ class AsciiRenderer:
         self.max_height = 0
         self.char_pix = {}
         self.char_rec = {}
-        for i in range(33,0x4FF):
+        for i in range(33,0x1FF):
             try:
-                unichr(i)#.decode(self.used_encoding)
+                unichr(i).encode(self.used_encoding)
             except UnicodeDecodeError:
                 continue
             except UnicodeEncodeError:
@@ -97,7 +97,7 @@ class AsciiRenderer:
         print "Character height: "+repr(self.max_height)
         
         chr_set = ''.join(self.char_pix.keys()) 
-        print "Character set: ",chr_set       
+        print "Character set: ",chr_set.encode('latin-1', 'ignore')       
  
         # convert picture to numpy arrays
         self.num_threads = 4
@@ -184,6 +184,7 @@ class Renderer(Process):
                 else:
                     # block finished, quit
                     run_loop = False
+                    continue
     
             if self.fixed_width <= 0:
                 x += self.char_pix[best_char].shape[0]
@@ -202,10 +203,10 @@ def convert(filename):
     time_start = pygame.time.get_ticks()
     
     ol = r.render()
-    print ol
+    print ol.encode('latin-1','replace')
 
     of = open("ascii_art.txt", "w")
-    of.write(ol)
+    of.write(ol.encode('utf-8','replace'))
     of.close()        
 
     print "rendered in: "+repr((pygame.time.get_ticks()-time_start)/1000)+" seconds."
